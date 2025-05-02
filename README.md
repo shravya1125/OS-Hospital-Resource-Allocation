@@ -66,7 +66,7 @@ An **intelligent hospital resource management system** that leverages **machine 
 
 ## 📸 Screenshot
 
-(images/screenshot(324).png) 
+![Dashboard Screenshot](images/screenshot(324).png) 
 (images/screenshot(325).png)
 (images/screenshot(327).png)
 
