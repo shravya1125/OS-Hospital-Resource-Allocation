@@ -64,11 +64,13 @@ An **intelligent hospital resource management system** that leverages **machine 
    Open your browser and go to:
    👉 [http://127.0.0.1:5000/dashboard](http://127.0.0.1:5000/dashboard)
 
-## 📸 Screenshot
 
-![Dashboard Screenshot](images/screenshot(324).png) 
-(images/screenshot(325).png)
-(images/screenshot(327).png)
+## 📸 Screenshots
+
+![Patient Form](images/Screenshot%20(324).png)
+![Allocate Resources](images/Screenshot%20(325).png)
+![Live Updates](images/Screenshot%20(327).png)
+
 
 ## 🤝 Contributing
 
