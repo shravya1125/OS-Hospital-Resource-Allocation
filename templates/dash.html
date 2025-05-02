@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>Patient Risk Chart</h2>
+    <canvas id="riskChart" width="400" height="200"></canvas>
+
+    <h2>Resource Availability</h2>
+    <canvas id="resourcesChart" width="400" height="200"></canvas>
+
+    <h2>Allocate Resources</h2>
+    <form id="allocationForm">
+        <label for="patientId">Patient ID:</label>
+        <input type="text" id="patientId" required><br><br>
+
+        <label>ICU Beds:</label>
+        <input type="number" id="icuBeds" min="0" value="0"><br>
+
+        <label>Ventilators:</label>
+        <input type="number" id="ventilators" min="0" value="0"><br>
+
+        <label>Doctors:</label>
+        <input type="number" id="doctors" min="0" value="0"><br><br>
+
+        <h4>Patient Risk Factors:</h4>
+        <label><input type="checkbox" id="fever"> Fever</label><br>
+        <label><input type="checkbox" id="bp_low"> Low Blood Pressure</label><br>
+        <label><input type="checkbox" id="diabetes"> Diabetes</label><br><br>
+
+        <button type="submit">Allocate</button>
+    </form>
+
+    <br>
+    <div id="resultBox" style="margin-top: 20px;"></div>
+
+    <script>
+        const patients = {{ patients | tojson | safe }};
+        const available = {{ available | tojson | safe }};
+
+        // Initialize Risk Chart
+        const riskCtx = document.getElementById('riskChart').getContext('2d');
+        const riskLabels = patients.map(p => p.name);
+        const riskData = patients.map(p => p.risk);
+
+        const riskChart = new Chart(riskCtx, {
+            type: 'bar',
+            data: {
+                labels: riskLabels,
+                datasets: [{
+                    label: 'Patient Risk Scores',
+                    data: riskData,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1
+                    }
+                }
+            }
+        });
+
+        // Initialize Resource Pie Chart
+        const resCtx = document.getElementById('resourcesChart').getContext('2d');
+        const resourcesChart = new Chart(resCtx, {
+            type: 'pie',
+            data: {
+                labels: ['ICU Beds', 'Ventilators', 'Doctors'],
+                datasets: [{
+                    label: 'Available Resources',
+                    data: available,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Form Handler
+        document.getElementById("allocationForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const patientId = document.getElementById("patientId").value;
+            const icuBeds = parseInt(document.getElementById("icuBeds").value);
+            const ventilators = parseInt(document.getElementById("ventilators").value);
+            const doctors = parseInt(document.getElementById("doctors").value);
+
+            const fever = document.getElementById("fever").checked ? 1 : 0;
+            const bp_low = document.getElementById("bp_low").checked ? 1 : 0;
+            const diabetes = document.getElementById("diabetes").checked ? 1 : 0;
+
+            const payload = {
+                patient_id: patientId,
+                request: [icuBeds, ventilators, doctors],
+                features: {
+                    fever: fever,
+                    bp_low: bp_low,
+                    diabetes: diabetes
+                }
+            };
+
+            const resultBox = document.getElementById("resultBox");
+            resultBox.innerHTML = "<em>Allocating resources, please wait...</em>";
+
+            try {
+                const response = await fetch("/allocate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    resultBox.innerHTML = `
+                        <div style="background-color: #d4edda; padding: 10px; border: 1px solid #28a745; color: #155724; border-radius: 5px;">
+                            ✅ <strong>${result.message}</strong>
+                            <br><br><strong>Available Resources:</strong>
+                            <ul>
+                                <li>ICU Beds: ${result.available[0]}</li>
+                                <li>Ventilators: ${result.available[1]}</li>
+                                <li>Doctors: ${result.available[2]}</li>
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    resultBox.innerHTML = `
+                        <div style="background-color: #f8d7da; padding: 10px; border: 1px solid #dc3545; color: #721c24; border-radius: 5px;">
+                            ❌ <strong>${result.message}</strong>
+                        </div>
+                    `;
+                }
+
+                // Update Pie Chart
+                resourcesChart.data.datasets[0].data = result.available;
+                resourcesChart.update();
+
+                // Update Bar Chart only if high-risk
+                if (result.success && result.message.includes("high-risk")) {
+                    const newRiskScore = (fever + bp_low + diabetes) >= 2 ? 0.85 : 0.4;
+                    riskChart.data.labels.push(patientId);
+                    riskChart.data.datasets[0].data.push(newRiskScore);
+                    riskChart.update();
+                }
+
+                // Reset form
+                document.getElementById("allocationForm").reset();
+
+            } catch (error) {
+                console.error("Error allocating resources:", error);
+                resultBox.innerHTML = `
+                    <div style="background-color: #fff3cd; padding: 10px; border: 1px solid #ffc107; color: #856404; border-radius: 5px;">
+                        ⚠️ Error connecting to server.
+                    </div>
+                `;
+            }
+            
+        });
+    </script>
+</body>
+</html>
