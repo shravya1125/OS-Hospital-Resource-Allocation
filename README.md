@@ -1,5 +1,6 @@
 # 🚑 Dynamic Resource Allocation Framework for Hospital Management
 
+![Project Banner](images/banner.png)
 
 ## 🧠 Description
 
@@ -35,6 +36,7 @@ An **intelligent hospital resource management system** that leverages **machine 
 ├── app.py                  # Entry point for Flask app
 ├── images/
 │   └── screenshot.png
+│   └── banner.png
 ├── core/                   # Core logic and API routes
 │   ├── model.py            # ML model setup and prediction
 │   ├── resource_manager.py # Resource allocation and emergency logic
