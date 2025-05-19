@@ -1,37 +1,37 @@
-import numpy as np
-import threading
-from .model import classify_risk
+class ResourceManager:
+    def __init__(self, beds=10, ventilators=5, doctors=8):
+        self.resources = {"Beds": beds, "Ventilators": ventilators, "Doctors": doctors}
+        self.patients = []
 
-class HospitalResourceManager:
-    def __init__(self, resources):
-        self.total = np.array(resources)
-        self.available = self.total.copy()
-        self.allocations = {}
-        self.lock = threading.Lock()
+    def allocate(self, patient):
+        # Simple allocation: allocate 1 bed, 1 ventilator, 1 doctor if available
+        if all(self.resources[r] > 0 for r in self.resources):
+            for r in self.resources:
+                self.resources[r] -= 1
+            self.patients.append(patient)
+            return True, "Resources allocated."
+        else:
+            return False, "Not enough resources."
 
-    def allocate_resources(self, patient_id, request, patient_data):
-        with self.lock:
-            request = np.array(request)
-            if any(request > self.available):
-                return False, "Insufficient resources"
-
-            risk = classify_risk(patient_data)
-            if risk == 1:  # High risk
-                self.available -= request
-                self.allocations[patient_id] = request
-                return True, f"Resources allocated to high-risk patient {patient_id}"
-            else:
-                return False, "Low-risk patient - no emergency allocation"
-
-    def emergency_interrupt(self, patient_id, request):
-        with self.lock:
-            request = np.array(request)
-            self.available -= request
-            self.allocations[patient_id] = request
-            return True, "Emergency interrupt allocation done"
+    def emergency(self, patient):
+        # Emergency: prioritize patient, allocate if any resource is available
+        allocated = False
+        for r in self.resources:
+            if self.resources[r] > 0:
+                self.resources[r] -= 1
+                allocated = True
+        if allocated:
+            self.patients.insert(0, patient)  # Emergency patients at top
+            return True, "Emergency resources allocated."
+        else:
+            return False, "No resources available for emergency."
 
     def status(self):
+        # For dashboard: return patients and available resources as list
         return {
-            "available": self.available.tolist(),
-            "allocations": {pid: alloc.tolist() for pid, alloc in self.allocations.items()}
+            "patients": self.patients,
+            "available": [self.resources["Beds"], self.resources["Ventilators"], self.resources["Doctors"]]
         }
+
+
+
