@@ -1,28 +1,28 @@
-# 🚑 Dynamic Resource Allocation Framework for Hospital Management
+# Dynamic Resource Allocation Framework for Hospital Management
 
 ![Project Banner](images/banner.png)
 
-## 🧠 Description
+## Description
 
 An **intelligent hospital resource management system** that leverages **machine learning** for risk-aware patient triaging, **interrupt-driven emergency scheduling**, and a **real-time dashboard** built with Flask and Chart.js.
 
 
-## 🚀 Features
+## Features
 
-* 🔬 **ML-Based Risk Prediction**
+* **ML-Based Risk Prediction**
   Uses medical indicators (fever, low BP, diabetes) to predict patient risk.
 
-* 📊 **Priority-Based Resource Allocation**
+* **Priority-Based Resource Allocation**
   Allocates ICU beds, ventilators, and doctors to high-risk patients based on classification.
 
-* ⚡ **Interrupt-Driven Emergency Handling**
+* **Interrupt-Driven Emergency Handling**
   Critical patients can override the normal allocation flow.
 
-* 📈 **Live Dashboard**
+* **Live Dashboard**
   Interactive interface to monitor resource availability and patient risk scores in real-time.
 
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 * **Backend**: Python, Flask, threading
 * **Machine Learning**: scikit-learn, Pandas, NumPy
@@ -47,7 +47,7 @@ An **intelligent hospital resource management system** that leverages **machine 
 └── README.md
 
 
-## 📦 Installation & Setup
+## Installation & Setup
 
 1. **Clone the repository**
 
