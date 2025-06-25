@@ -68,11 +68,13 @@ An **intelligent hospital resource management system** that leverages **machine 
 
 
 ## 📸 Screenshots
+![Dashboard](https://github.com/user-attachments/assets/f50ac36d-1115-445d-93f5-66e9c55e5bcd)
 
 ![Patient Form](images/Screenshot%20(324).png)
-![Allocate Resources](images/Screenshot%20(325).png)
-![Live Updates](images/Screenshot%20(327).png)
 
+![Allocate Resources](images/Screenshot%20(325).png)
+
+![Live Updates](images/Screenshot%20(327).png)
 
 ## 🤝 Contributing
 
